@@ -1,0 +1,39 @@
+# Common
+.DS_Store
+Thumbs.db
+.env
+.env.local
+*.log
+
+# Portable VSCode instance (local only)
+.vscode-portable/
+
+# Tutorial state (auto-removed after completion)
+.tutorial/state.json
+
+# SQLite temp files (WAL and shared memory -- auto-managed)
+.claude/claude.db-wal
+.claude/claude.db-shm
+
+# Defense-in-depth against the stray-DB bug (fixed in shared/db.py): a .claude/
+# inside a sub-directory is never legitimate -- the workspace has exactly one
+# .claude/ at the root. Ignore .claude/ at ANY depth, then re-include the root
+# one. Projects live at nested paths (e.g. apps/web), so a stray could appear
+# more than one level deep; this catches all of them while keeping the root
+# .claude/ tracked.
+**/.claude/
+!/.claude/
+
+# Per-machine local settings overrides -- never shipped to clones. Shared
+# defaults (incl. enabled MCP servers) live in .claude/settings.json.
+.claude/settings.local.json
+
+# Python venv for MCP servers (created during setup)
+.claude/venv/
+
+# Auto-generated board snapshot
+project/board-snapshot.md
+
+# Python cache
+__pycache__/
+*.pyc

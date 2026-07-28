@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "template_version": "2.1.0",
+  "template_dev": false,
+  "project_name": "ai-development-template",
+  "greeting": "Hey there little feller",
+  "workspace_scope": "project",
+  "enforcement": "full",
+  "language": "python",
+  "source_roots": [
+    "src"
+  ],
+  "source_extensions": [
+    ".py",
+    ".pyi"
+  ],
+  "exclude_dirs": [
+    "node_modules",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    ".git",
+    ".claude",
+    "__pycache__",
+    "target",
+    "out",
+    ".next",
+    "coverage",
+    "docs",
+    "tests"
+  ],
+  "doc_patterns": [
+    "docs/**/*.md"
+  ],
+  "board_dir": "project/boards",
+  "build_command": "",
+  "test_command": "pytest",
+  "test_runner": "pytest",
+  "test_convention": {
+    "source_dir": "src",
+    "test_dir": "tests",
+    "suffix": "_test",
+    "extension": ""
+  },
+  "skip_test_patterns": [],
+  "projects": [
+    {
+      "slug": "ai-development-template",
+      "name": "ai-development-template",
+      "path": "ai-development-template",
+      "description": "A template for AI-assisted development within existing agent frameworks like Claude Code and Codex, focused on extensibility, flexibility, and portability.",
+      "source_roots": [
+        "src"
+      ],
+      "source_extensions": [
+        ".py",
+        ".pyi",
+        ".md",
+        ".sh"
+      ],
+      "test_command": "pytest"
+    }
+  ]
+}

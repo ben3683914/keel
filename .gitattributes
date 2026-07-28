@@ -1,0 +1,10 @@
+# Force LF line endings for all text files
+* text=auto eol=lf
+
+# Binary files
+*.db binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+*.exe binary

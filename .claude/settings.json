@@ -1,0 +1,159 @@
+{
+  "model": "opus",
+  "env": {
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
+  },
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "NotebookEdit",
+      "Bash(git *)",
+      "Bash(cd *&&*git *)",
+      "Bash(python3 *)",
+      "Bash(pip *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(cargo *)",
+      "Bash(go *)",
+      "Bash(dotnet *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(rm *)",
+      "Bash(ls *)",
+      "Bash(touch *)",
+      "Bash(cat *)",
+      "Bash(echo *)",
+      "Bash(wc *)",
+      "Bash(find *)",
+      "Bash(*setup.sh*)",
+      "Bash(*inspect_db.py*)",
+      "Bash(*engine-update*)",
+      "Bash(*assemble.py*)",
+      "Bash(*reset_for_distribution.py*)",
+      "mcp__task-manager__*",
+      "mcp__docs-manager__*",
+      "mcp__code-manager__*",
+      "mcp__test-manager__*"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git rebase*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(git branch -D*)",
+      "Bash(git checkout -- *)"
+    ]
+  },
+  "enableExperimentalAgentTeams": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/cleanup_boards.py\"",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/guard_boards.py\"",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/commit_quality.py\"",
+            "timeout": 30000
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__task-manager__.*|mcp__code-manager__acknowledge_.*|mcp__docs-manager__acknowledge_review|mcp__test-manager__acknowledge_tests",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/template_dev_guard.py\"",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/commit_gate.py\"",
+            "timeout": 30000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/track_modifications.py\"",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__task-manager__.*|mcp__docs-manager__.*|mcp__test-manager__.*|mcp__code-manager__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/track_modifications.py\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "FileChanged": [
+      {
+        "matcher": "docs/constitution/*.md",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/constitution_watch.py\"",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/venv/bin/python\" \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/session_gate.py\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "task-manager",
+    "docs-manager",
+    "code-manager",
+    "test-manager"
+  ]
+}

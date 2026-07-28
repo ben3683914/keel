@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "template_version": "2.1.0",
+  "articles": [
+    {
+      "source_id": "template:architecture-doc-as-source-of-truth",
+      "number": 1,
+      "title": "Architecture Doc as Source of Truth",
+      "category": "design",
+      "context": "The architecture document is the canonical map of the entire system. It defines how components relate, what technologies are used, and how data flows. Without a maintained architecture doc, developers make local decisions that conflict with the global design.",
+      "rule_text": "The architecture document (docs/core/architecture.md) is the authoritative reference for system structure, components, and their relationships. It must be updated whenever a new system is added, a component is restructured, or the tech stack changes. All feature docs must be reachable from the architecture doc sub-documents table. The architecture doc is loaded at every session start.",
+      "consequences": "An outdated architecture doc leads to contradictory designs, duplicated systems, and integration failures. It is the first doc any new developer or AI agent reads.",
+      "enforcement": "Doc reviewer verifies the architecture doc is updated when new systems are introduced. get_startup_docs includes it for every session. Health checks flag if the architecture doc last-updated date is older than recent feature docs.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-04-12"
+    },
+    {
+      "source_id": "template:design-before-implementation",
+      "number": 2,
+      "title": "Design Before Implementation",
+      "category": "design",
+      "context": "The development process prioritizes understanding and planning over speed. Rushing to code without a design leads to rework, inconsistent architecture, and documentation gaps.",
+      "rule_text": "All new features and systems must have a design document created and reviewed before implementation begins. The design doc defines the purpose, interfaces, data flow, and integration points, and follows the feature-doc structure defined in Article 006. Genuinely undecided sections may be marked [Pending] and resolved before the work is validated. Quick fixes and hotfixes are exempt, but any work that introduces a new system, API, or significant behavior change requires design-first documentation.",
+      "consequences": "Code written without a design doc may require rework when architectural issues surface. The docs-reviewer agent will flag missing design documentation as an unresolved issue during review.",
+      "enforcement": "The design-before-implementation principle is satisfied when a new system, API, or significant behavior change ships with a committed design document. Reviewers treat a qualifying change that arrives with no design document at all as a violation of this article. The canonical check that the document exists in docs/features/ with the required structure lives in Article 006 \u2014 defer structural and completeness findings there rather than duplicating them here.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-06-05"
+    },
+    {
+      "source_id": "template:honest-and-collaborative-partnership",
+      "number": 3,
+      "title": "Honest and Collaborative Partnership",
+      "category": "collaboration",
+      "context": "AI agents that only execute instructions without questioning them produce worse outcomes than agents that actively collaborate. The most valuable AI behavior is surfacing trade-offs, pushing back on flawed approaches, and proposing alternatives \u2014 even when not asked. Conversely, rubber-stamping every user request leads to preventable mistakes.",
+      "rule_text": "Claude must be truthful, direct, and collaborative at all times. This means: (1) push back when an approach has significant drawbacks the user may not have considered, (2) suggest alternatives when a better option exists, (3) flag contradictions between the request and existing architecture or constitution articles, (4) ask for permission before bypassing any constitution article, never silently ignore one, (5) say 'I don't know' rather than guessing when uncertain. The user should expect to be challenged constructively \u2014 agreement should be earned, not automatic.",
+      "consequences": "Silent compliance leads to technical debt, architectural drift, and decisions that have to be unwound later. An honest partner catches problems early when they are cheap to fix.",
+      "enforcement": "This article is self-reinforcing \u2014 it is injected into every doc response as a constant reminder. Violations (e.g., silently skipping a constitution article) should be flagged during code review.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-04-12"
+    },
+    {
+      "source_id": "template:version-metadata-on-all-docs",
+      "number": 4,
+      "title": "Version Metadata on All Docs",
+      "category": "documentation",
+      "context": "Documentation without metadata is impossible to maintain at scale. Knowing when a doc was last updated, its current status, and what version it reflects enables the health check system and reviewers to detect staleness.",
+      "rule_text": "Every documentation file in docs/ must include a metadata header with version (X.Y.Z), last updated date (YYYY-MM-DD), and status (Draft, Approved, or Deprecated). Version increments: major (restructure/rewrite), minor (new sections/significant changes), patch (corrections/clarifications). Status must be kept current \u2014 a doc that falls behind the code should be marked Draft until updated. Auto-generated files are exempt from the metadata-header requirement: files regenerated from SQLite, such as the constitution articles under docs/constitution/ and project/board-snapshot.md, instead carry an auto-generation marker (a 'do not edit' banner or a generation timestamp), and their provenance \u2014 and, where applicable, version and status \u2014 is tracked in the source data rather than in a manual header.",
+      "consequences": "Docs without metadata cannot be audited for staleness. Reviewers and health checks have no baseline to compare against.",
+      "enforcement": "Doc reviewer checks for metadata header on all reviewed docs. Missing metadata is flagged as an unresolved issue.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-06-05"
+    },
+    {
+      "source_id": "template:hub-and-sub-document-pattern",
+      "number": 5,
+      "title": "Hub and Sub-Document Pattern",
+      "category": "documentation",
+      "context": "Large monolithic documents are difficult to navigate, slow to load into context, and prone to section-level staleness. Splitting into focused sub-documents allows selective loading and targeted maintenance.",
+      "rule_text": "Documentation files approaching approximately 200 lines should be evaluated for splitting into a hub page and focused sub-documents; splitting becomes mandatory before a file exceeds the 500-line hard limit defined in Article 008. The hub page contains a summary, a sub-documents table with descriptions, and links to each sub-document. Sub-documents reference their parent hub, and each covers one focused topic.",
+      "consequences": "Monolithic docs waste context tokens when only one section is relevant. They also increase the risk of stale sections going unnoticed.",
+      "enforcement": "check_doc_health flags docs exceeding 500 lines as oversized. Docs between 200-500 lines should be evaluated for splitting during doc review.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-06-05"
+    },
+    {
+      "source_id": "template:feature-documentation-required",
+      "number": 6,
+      "title": "Feature Documentation Required",
+      "category": "documentation",
+      "context": "Every system, feature, or module that has distinct behavior deserves its own documentation. Without feature docs, knowledge lives only in code and the heads of developers \u2014 both are fragile sources of truth.",
+      "rule_text": "Any new system, API, or significant behavior change requires a technical design document in docs/features/. A design document that satisfies this article also satisfies Article 002's design-before-implementation requirement. The document must follow the standard feature doc structure: metadata header, overview, interface/API reference, data flow (Mermaid diagram), dependencies, configuration, error handling, security considerations, and testing notes. If the initial doc is architecture-level only (missing full spec sections), those sections must be marked [Pending] and a task auto-created to complete them.",
+      "consequences": "Features without documentation cannot be properly reviewed, tested, or maintained by other developers or AI agents. Institutional knowledge is lost when the original developer moves on.",
+      "enforcement": "This is the single canonical feature-doc check. During doc review, verify that every new system, API, or significant behavior change in the diff has a corresponding feature doc in docs/features/ with the required structure. Missing docs are flagged as unresolved. Docs with [Pending] sections trigger auto-task creation for completion. Article 002 defers its structural check here.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-06-05"
+    },
+    {
+      "source_id": "template:mermaid-for-all-diagrams",
+      "number": 7,
+      "title": "Mermaid for All Diagrams",
+      "category": "documentation",
+      "context": "Diagrams are essential for understanding system architecture, data flows, and state machines. Using a consistent, text-based format ensures diagrams are versioned with code, render in GitHub and VSCode, and can be maintained by both humans and AI agents.",
+      "rule_text": "All technical diagrams must use Mermaid code blocks embedded in markdown. Supported diagram types: graph (architecture, component relationships), sequenceDiagram (request/response flows), stateDiagram-v2 (state machines), flowchart (process flows, decision trees). Every diagram must be followed by a prose explanation \u2014 diagrams supplement text, they do not replace it.",
+      "consequences": "Non-Mermaid diagrams (images, ASCII art, external tools) cannot be version-controlled or auto-verified. They become stale without detection.",
+      "enforcement": "Code and doc reviewers check that new diagrams use Mermaid syntax. External image references for technical diagrams are flagged as advisory issues.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-04-12"
+    },
+    {
+      "source_id": "template:documentation-size-limit",
+      "number": 8,
+      "title": "Documentation Size Limit",
+      "category": "documentation",
+      "context": "Large files strain context windows, slow down selective loading, and tend to accumulate stale sections. A hard limit forces decomposition into focused, maintainable units.",
+      "rule_text": "Individual documentation files must not exceed 500 lines. When a file approaches or exceeds this limit, it must be refactored using the hub and sub-document pattern (Article 005). The 500-line limit is enforced by check_doc_health and flagged as a warning during health checks.",
+      "consequences": "Oversized docs waste context tokens, slow down get_relevant_docs responses, and increase the chance of stale content going unnoticed.",
+      "enforcement": "check_doc_health flags any doc exceeding 500 lines. Code reviewer and doc reviewer escalate to critical if a doc exceeds 1000 lines.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-04-12"
+    },
+    {
+      "source_id": "template:tables-over-prose-for-structured-data",
+      "number": 9,
+      "title": "Tables Over Prose for Structured Data",
+      "category": "documentation",
+      "context": "API parameters, configuration options, field definitions, error codes, and other structured data are easier to scan, compare, and maintain in table format. Prose descriptions of structured data become ambiguous and hard to update.",
+      "rule_text": "All structured data in documentation must use markdown tables with consistent columns. Field definitions: Name, Type, Required, Default, Description. API parameters: Parameter, Type, Description. Error codes: Code, Meaning, Resolution. Configuration: Option, Type, Default, Description. Tables must be followed by prose only when additional context is needed for complex fields.",
+      "consequences": "Prose-based field descriptions are harder to maintain, easier to miss updates, and more ambiguous for implementers.",
+      "enforcement": "Doc reviewer checks that structured data uses table format. Prose lists describing fields, parameters, or options are flagged as advisory issues.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-04-12"
+    },
+    {
+      "source_id": "template:plan-completion-verification",
+      "number": 10,
+      "title": "Plan Completion Verification",
+      "category": "workflow",
+      "context": "AI agents can lose track of plan items during complex implementations, especially when plans span multiple files or systems. External reviews (code, docs, security, tests) catch issues but run after implementation is complete. A self-verification step catches gaps immediately, before review overhead is incurred.",
+      "rule_text": "Every implementation plan must include a final verification step where the implementing agent audits its own work against the original plan. The self-audit must check: (1) every plan item was completed, (2) no placeholder or TODO code was left behind, (3) tests cover new or modified code. If gaps are found, fix them before proceeding to the review pipeline. This step is in addition to, not a replacement for, the code/docs/security/test review sequence.",
+      "consequences": "Without self-verification, incomplete implementations enter the review pipeline, wasting review cycles on obvious gaps. Reviewers should catch substantive issues, not missing plan items.",
+      "enforcement": "Plan mode should include the verification step by default. Code reviewer flags if the plan had items that appear unimplemented in the diff.",
+      "created_date": "2026-04-12",
+      "ratified_date": "2026-04-12"
+    },
+    {
+      "source_id": "template:docs-before-source-for-conceptual-questions",
+      "number": 11,
+      "title": "Docs Before Source for Conceptual Questions",
+      "category": "workflow",
+      "context": "The doc system is the intended first-line source for conceptual context. Skipping it and reading source directly bypasses the routing layer, misses current context captured in feature docs, and forgoes constitution-article injection that `get_relevant_docs` performs in the same call. Past sessions have fallen into the source-first reflex on ad-hoc questions because earlier framing positioned `get_relevant_docs` as a task-lifecycle step rather than a standing rule. Docs often carry architectural intent, decisions, and nuance that source doesn't surface \u2014 answering from source alone can produce explanations that are technically accurate but miss the \"why.\"",
+      "rule_text": "When answering a conceptual question about the codebase \u2014 how a system works, what something does, an architecture or API explanation \u2014 `get_relevant_docs` must be called before reading source files. This applies outside of formal task context, including ad-hoc conversational questions. Source files are for verification and mechanical lookups (specific lines, signatures, grep-style checks), not first-pass conceptual understanding.",
+      "consequences": "Answers based solely on source reads may contradict current architectural decisions documented elsewhere, or miss constitution articles relevant to the topic. The docs-reviewer agent will flag explanatory responses that did not call `get_relevant_docs` first. The answering agent risks teaching users to trust source as the canonical reference when the doc layer was designed to be authoritative.",
+      "enforcement": "During review, check whether conceptual-question responses were preceded by a `get_relevant_docs` call in the same conversation. One call per topic per session is sufficient \u2014 the rule targets the first-pass reflex, not redundant re-queries. Mechanical reads (specific line numbers, signature checks, verification after docs were consulted) are exempt.",
+      "created_date": "2026-04-22",
+      "ratified_date": "2026-04-23"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "task-manager": {
+      "command": ".claude/venv/bin/python",
+      "args": [".claude/scripts/mcp/task_manager.py"]
+    },
+    "docs-manager": {
+      "command": ".claude/venv/bin/python",
+      "args": [".claude/scripts/mcp/docs_manager.py"]
+    },
+    "code-manager": {
+      "command": ".claude/venv/bin/python",
+      "args": [".claude/scripts/mcp/code_manager.py"]
+    },
+    "test-manager": {
+      "command": ".claude/venv/bin/python",
+      "args": [".claude/scripts/mcp/test_manager.py"]
+    }
+  }
+}
