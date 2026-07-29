@@ -5,7 +5,9 @@
 
 ## Overview
 
-The state layer is Keel's foundation: every entity the framework persists (tasks, arcs, articles, docs, config), where each lives, how IDs are minted, how files are validated and repaired, and how curated routing signals are stored. It implements the ratified state-kind taxonomy (Article 004): **truth** is per-entity mergeable text tracked in git; **derived** is gitignored and rebuildable; **ephemera** is per-machine and never tracked; **history** is git itself.
+The state layer is Keel's foundation: every entity the framework persists (tasks, arcs, articles, docs, config), where each lives, how IDs are minted, how files are validated and repaired, and how curated routing signals are stored. It implements the ratified state-kind taxonomy (Article 004, State Declares Its Kind): **truth** is per-entity mergeable text tracked in git; **derived** is gitignored and rebuildable; **ephemera** is per-machine and never tracked; **history** is git itself.
+
+Article citations in this doc refer to the ratified rewrite articles (ai-development-template/001–006), cited with their titles at first use; workspace-tier articles are always cited as "workspace Article NNN".
 
 Decisions fixed upstream and not re-litigated here: text-as-truth architecture, markdown+frontmatter formats, random-slug IDs, banded article numbers, git-as-archive, the board.md projection (see the decision record). Decisions made in this design's interview (2026-07-28): **per-project state layout**, **created-only timestamps**, **strict core schemas with an `ext:` extension namespace**.
 
@@ -54,14 +56,14 @@ Notes:
 
 - Ephemera lives **inside the working copy** (`.keel/local/`), so "per machine" is implicitly "per working copy" — two clones on one machine keep separate gate evidence, which is more correct, not less (evidence attests to a working copy's file state). Watermarks are still keyed by repo-root **inside** the file (G18 seam 2: one is a count, not a shape).
 - Credential profiles (G9) are also ephemera but are shared across workspaces on a machine; they live under the user home directory, not `.keel/`. Their format is owned by the onboarding design. [Pending: credential profile file format — owned by T-023]
-- The validator hard-fails if any `.keel/` path or `board.md` is ever tracked (V-13 below) — the shipped `.gitignore` is the fence, the validator is the alarm.
+- If any `.keel/` path or `board.md` is ever tracked, the validator raises a critical proposed finding and never auto-removes it (V-13 below) — the shipped `.gitignore` is the fence, the validator is the alarm.
 
 ## File Formats
 
 - Human-facing entities (tasks, arcs, articles, docs): **markdown + YAML frontmatter**. Frontmatter is machine surface; the body is prose and a first-class diff/merge surface.
 - Structural records (config, curation, manifests): **YAML**.
 - Size limits count the **prose body only**, excluding frontmatter. Health checks report both numbers.
-- Frontmatter is written back in a **canonical serialization** (fixed key order per schema, 2-space indent, no flow maps): idempotent rewrites produce byte-identical files (Article 002) and diffs stay minimal.
+- Frontmatter is written back in a **canonical serialization** (fixed key order per schema, 2-space indent, no flow maps): idempotent rewrites produce byte-identical files (Article 002, Idempotent Reproducible Operations) and diffs stay minimal. Hand-added YAML comments travel with the key they precede; if comments cannot be safely re-anchored, V-12 skips the file and reports a proposed finding instead of rewriting.
 
 ### Schema strictness (interview decision)
 
@@ -75,7 +77,9 @@ ext:
 
 ## Entity Schemas
 
-All entities share three invariants: `id` (immutable identity), `created` (stamped once at mint, `YYYY-MM-DD`, never updated — modification history is git's job), and optional `ext:`. There is no `updated` field: it duplicates git and is a guaranteed same-line merge conflict.
+Work items (tasks, arcs) share three invariants: `id` (immutable identity), `created` (stamped once at mint, `YYYY-MM-DD`, never updated — modification history is git's job), and optional `ext:`. Articles substitute `slug` for `id` as identity but carry `created` and `ext:` the same way. Docs and config files are identified by path, carry `ext:`, and have their own field sets — no `id` or `created`. No entity anywhere has an `updated` field except docs (workspace Article 004 mandate): elsewhere it duplicates git and is a guaranteed same-line merge conflict.
+
+Defaults apply at **mint time only** — the engine resolves and writes the value into the file. A required field missing from an on-disk file is a V-8 finding, never silently defaulted at read time.
 
 ### Task
 
@@ -140,8 +144,8 @@ Docs live in `docs/` trees, not `state/` — they are already per-entity text; t
 
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| `version` | string | yes | — | SemVer (Article 004 rules) |
-| `updated` | date | yes | — | Last-updated date (kept: Article 004 requires it; docs are versioned artifacts, unlike work items) |
+| `version` | string | yes | — | SemVer (workspace Article 004 rules) |
+| `updated` | date | yes | — | Last-updated date (kept: workspace Article 004, Version Metadata on All Docs, requires it; docs are versioned artifacts, unlike work items) |
 | `status` | enum | yes | `Draft` | `Draft` \| `Approved` \| `Deprecated` |
 | `keywords` | string[] | no | `[]` | Curated routing keywords — LLM judgment frozen at authoring time |
 | `source_paths` | string[] | no | `[]` | Glob mappings to source this doc describes; drives staleness flags (G15) |
@@ -160,7 +164,7 @@ One versioned, validated, migrated schema. `schema_version` is the migration anc
 |------|------|----------|---------|-------------|
 | `schema_version` | int | yes | — | Config schema version; update client migrates |
 | `name` | string | yes | — | Workspace display name |
-| `projects` | map | yes | `{}` | slug → `{path, article_block}` — **path is declared data** (G18 seam 1) |
+| `projects` | map | yes | `{}` | slug → `{path}` — **path is declared data** (G18 seam 1); the article block lives only in the project's own config (one truth location) |
 | `retention` | map | no | shipped defaults | Per-board pruning windows (e.g. `done: 30d`); freezer not configurable — never prunes |
 | `scoring` | map | no | shipped defaults | Named routing weights + `scorer` registry key (swappable) |
 | `startup_budget` | int | no | shipped default | Token budget for `load_at_start` docs |
