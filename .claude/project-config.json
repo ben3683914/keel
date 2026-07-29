@@ -39,9 +39,9 @@
   "test_runner": "pytest",
   "test_convention": {
     "source_dir": "src",
-    "test_dir": "tests",
-    "suffix": "_test",
-    "extension": ""
+    "test_dir": "tests/unit",
+    "suffix": ".test",
+    "extension": ".ts"
   },
   "skip_test_patterns": [],
   "projects": [
@@ -54,12 +54,13 @@
         "src"
       ],
       "source_extensions": [
+        ".ts",
         ".py",
         ".pyi",
         ".md",
         ".sh"
       ],
-      "test_command": "pytest"
+      "test_command": "npm test"
     }
   ]
 }

@@ -1,9 +1,14 @@
+> **Version:** 0.2.0
+> **Last Updated:** 2026-07-29
+> **Status:** Active
+
 # Setup Guide
 
 ## Requirements
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 - Python 3.x (for MCP servers, hooks, and enforcement scripts)
+- Node.js >= 20 and npm (for the Keel engine in `ai-development-template/`)
 - Git
 
 Optional:
@@ -15,9 +20,9 @@ Optional:
 1. Copy the template to a new folder
 2. Open in Claude Code — `setup.sh` runs automatically during onboarding to bootstrap the venv and MCP servers
 3. Complete the onboarding interview (13 questions)
-4. Install project dependencies: (project-specific command)
-5. Run the project: (project-specific command)
-6. Run tests: (project-specific command)
+4. Install project dependencies: `cd ai-development-template && npm install`
+5. Verify the toolchain: `npm run ci` (typecheck + lint + format:check + test — the same gate CI runs)
+6. Run tests alone: `npm test` (or `npm run test:watch` during development) — see the [Testing Guide](testing.md)
 
 ## Portable VSCode
 

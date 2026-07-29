@@ -1,5 +1,5 @@
-> **Version:** 0.1.0
-> **Last Updated:** 2026-06-05
+> **Version:** 0.2.0
+> **Last Updated:** 2026-07-29
 > **Status:** Draft
 
 # Architecture
@@ -23,7 +23,9 @@ graph TD
 
 | Component | Purpose | Location |
 |-----------|---------|----------|
-| (add components as they are built) | | |
+| Keel engine (`keel-engine`) | TypeScript/Node engine for the Keel rewrite — state, routing, board, and git layers land here (T-009+) | `ai-development-template/` |
+| CI pipeline | `npm run ci` gate on PRs and pushes to main; ubuntu/macos × Node 20/22 required, windows advisory | `.github/workflows/ci.yml` |
+| Legacy template engine | Python MCP servers, hooks, and enforcement scripts (being rewritten as Keel) | `.claude/scripts/` |
 
 ## State Model
 
@@ -71,7 +73,8 @@ constitution, and task gates.
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| (filled during onboarding) | | |
+| Keel engine | TypeScript (strict, ESM, NodeNext) on Node >= 20 | Vitest + v8 coverage, ESLint (type-checked) + Prettier; npm with committed lockfile |
+| Legacy engine | Python 3.x | MCP servers, hooks, pytest regression tests |
 
 ## Data Flow
 
@@ -89,7 +92,10 @@ sequenceDiagram
 
 | Document | Description |
 |----------|-------------|
-| (feature docs linked here as they are created) | |
+| [keel-rewrite-goals.md](../features/keel-rewrite-goals.md) | Keel founding document — goals, concept inventory, keep/change/kill verdicts |
+| [keel-decisions/index.md](../features/keel-decisions/index.md) | Technical decision records (platform, state model, workflow, distribution, governance, collaboration) |
+| [state-layer.md](../features/state-layer.md) | Keel state layer design (T-007) |
+| [engine-scaffold.md](../features/engine-scaffold.md) | Keel engine scaffold & CI — source tree, toolchain, test strategy (T-008) |
 
 Feature docs live in `docs/features/`. Each new system or feature gets its own doc following the standard structure defined in [conventions.md](../guides/conventions.md).
 
