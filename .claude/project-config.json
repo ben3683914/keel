@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "template_version": "2.1.0",
+  "template_version": "2.5.0",
   "template_dev": false,
   "project_name": "ai-development-template",
   "greeting": "Hey there little feller",

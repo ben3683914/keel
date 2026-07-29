@@ -97,22 +97,22 @@ def run(root: Path):
     # --- resolve_run_target: slug -> projects-row path for cwd + per-slug command ---
     # (asserted statically; NO subprocess is launched)
     web_t = TM.resolve_run_target({"project": "web"})
-    check("run cwd from web row path (apps/web)", Path(web_t["cwd"]) == root / "apps" / "web")
+    check("run cwd from web row path (apps/web)", Path(web_t["cwd"]).resolve() == (root / "apps" / "web").resolve())
     check("run cmd is web test_command", web_t["test_cmd"] == "npm test")
     check("run slug echoed as 'web'", web_t["slug"] == "web")
 
     api_t = TM.resolve_run_target({"project": "api"})
-    check("run cwd from api row path (services/api)", Path(api_t["cwd"]) == root / "services" / "api")
+    check("run cwd from api row path (services/api)", Path(api_t["cwd"]).resolve() == (root / "services" / "api").resolve())
     check("run cmd is api test_command", api_t["test_cmd"] == "echo api-tests")
 
     # Auto-detect slug from files (single project) -> web's command + cwd.
     auto_t = TM.resolve_run_target({"files": ["apps/web/src/auth.ts"]})
     check("auto-detect slug from files -> 'web'", auto_t["slug"] == "web")
-    check("auto-detect resolves web cwd", Path(auto_t["cwd"]) == root / "apps" / "web")
+    check("auto-detect resolves web cwd", Path(auto_t["cwd"]).resolve() == (root / "apps" / "web").resolve())
 
     # No project + no files -> workspace-scoped: root cwd, top-level command, no echo.
     ws_t = TM.resolve_run_target({})
-    check("workspace run cwd is root", Path(ws_t["cwd"]) == root)
+    check("workspace run cwd is root", Path(ws_t["cwd"]).resolve() == root.resolve())
     check("workspace run uses top-level command", ws_t["test_cmd"] == "pytest")
     check("workspace run slug is None (no echo)", ws_t["slug"] is None)
 

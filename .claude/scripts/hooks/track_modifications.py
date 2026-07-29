@@ -17,10 +17,23 @@ from projects import project_for_path, get_active_project_id, set_active_project
 
 
 def make_relative(file_path, cwd):
+    """Path relative to the workspace root, tolerant of symlinked roots.
+
+    `file_path` arrives from the hook payload spelled however the tool reported
+    it, while `cwd` is the ALREADY-RESOLVED workspace root (get_project_root
+    resolves). When the workspace sits under a symlink -- macOS /tmp and /var,
+    a symlinked home or code directory -- the two spellings differ, relative_to
+    raises, and returning the absolute path makes every downstream prefix match
+    silently fail. Retry with both sides resolved before falling back."""
     try:
         return str(Path(file_path).relative_to(cwd)).replace("\\", "/")
     except ValueError:
-        return file_path.replace("\\", "/")
+        pass
+    try:
+        resolved = Path(file_path).resolve().relative_to(Path(cwd).resolve())
+        return str(resolved).replace("\\", "/")
+    except (ValueError, OSError):
+        return str(file_path).replace("\\", "/")
 
 
 def main():

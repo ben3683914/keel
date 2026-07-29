@@ -326,13 +326,29 @@ def get_all_source_dirs(conn) -> list[tuple[int, dict | None, Path]]:
     return out
 
 
+def _is_absolute(path_str: str) -> bool:
+    """True for POSIX (/x) and Windows (C:/x, //share) absolute paths. Operates
+    on the already-slash-normalized string so it agrees with the prefix matching
+    done by is_source_file, rather than re-parsing via Path()."""
+    if path_str.startswith("/"):
+        return True
+    return len(path_str) > 1 and path_str[1] == ":"
+
+
 def extract_auto_keywords(file_path: Path) -> list[str]:
     keywords = set()
     root = get_project_root()
     try:
         rel = str(file_path.relative_to(root)).replace("\\", "/")
     except ValueError:
-        rel = str(file_path).replace("\\", "/")
+        # Same symlinked-root case as is_source_file: retry with both sides
+        # resolved so keywords come from the project-relative path rather than
+        # from an absolute one (which would pull machine-specific path segments
+        # into the keyword set).
+        try:
+            rel = str(file_path.resolve().relative_to(root.resolve())).replace("\\", "/")
+        except (ValueError, OSError):
+            rel = str(file_path).replace("\\", "/")
 
     path_no_ext = re.sub(r"\.[^.]+$", "", rel)
     parts = path_no_ext.split("/")
@@ -521,6 +537,21 @@ def is_source_file(file_path: str) -> bool:
     rel = normalized
     if root_str and normalized.startswith(root_str + "/"):
         rel = normalized[len(root_str) + 1:]
+    elif _is_absolute(normalized):
+        # Absolute, yet not under the root AS SPELLED. get_project_root() is
+        # resolved, so a workspace under a symlink (macOS /var vs /private/var,
+        # a symlinked home or code dir) lands here with a valid path that simply
+        # uses the other spelling. Without this retry `rel` stays absolute, no
+        # source_root prefix ever matches, and the file is silently treated as
+        # non-source -- the enforcement gates then never fire. Only absolute
+        # paths are retried: resolving an already-relative path would resolve it
+        # against the process cwd, which is not necessarily the workspace root.
+        try:
+            resolved = str(Path(normalized).resolve()).replace("\\", "/")
+            if root_str and resolved.startswith(root_str + "/"):
+                rel = resolved[len(root_str) + 1:]
+        except OSError:
+            pass
     rel = rel.lstrip("/")
 
     config = load_project_config()

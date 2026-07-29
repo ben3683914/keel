@@ -75,16 +75,38 @@ fi
 # Install/upgrade the MCP package. This is the slow step: it downloads mcp plus
 # its dependencies. Output is left visible (no --quiet) so progress is obvious
 # instead of the script looking hung.
+#
+# The version is capped below 2.0 deliberately. Our four servers are built on
+# the decorator API (@server.list_tools() / @server.call_tool()), which mcp 2.0
+# removed outright -- it is gone from mcp.server.Server AND from
+# mcp.server.lowlevel.Server, so there is no drop-in import to switch to.
+# An unpinned `pip install --upgrade mcp` therefore silently breaks every MCP
+# server at import time. Do not relax this cap without porting the servers in
+# .claude/scripts/mcp/ to the 2.x API first.
 log "Installing the 'mcp' package and its dependencies (downloading — can take 30-90s on first run)..."
-if ! "$VENV_PY" -m pip install --upgrade mcp; then
+if ! "$VENV_PY" -m pip install --upgrade "mcp>=1.9,<2"; then
     echo "SETUP_ERROR: Failed to install MCP package"
     exit 1
 fi
 
-# Verify the import works
-log "Verifying the mcp import..."
-if ! "$VENV_PY" -c "from mcp.server import Server" 2>/dev/null; then
-    echo "SETUP_ERROR: MCP import verification failed"
+# Verify the servers actually load. Importing `Server` alone is NOT enough --
+# it still succeeds on mcp 2.0, where the decorators the servers use at module
+# scope are missing, so a shallow check reports success on a broken install.
+# Exercising a real server module is what catches an incompatible SDK.
+log "Verifying the MCP servers load..."
+# (this script cd's to the repo root at the top, so relative paths are correct)
+if ! "$VENV_PY" -c "
+import importlib.util, sys
+from pathlib import Path
+root = Path.cwd()
+sys.path.insert(0, str(root / '.claude' / 'scripts' / 'shared'))
+sys.path.insert(0, str(root / '.claude' / 'scripts' / 'mcp'))
+target = root / '.claude' / 'scripts' / 'mcp' / 'task_manager.py'
+spec = importlib.util.spec_from_file_location('_smoke', target)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+" 2>/dev/null; then
+    echo "SETUP_ERROR: MCP server verification failed (incompatible 'mcp' package?)"
     exit 1
 fi
 

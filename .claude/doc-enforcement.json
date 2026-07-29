@@ -1,15 +1,34 @@
 {
   "version": 2,
-  "doc_patterns": ["docs/**/*.md"],
+  "doc_patterns": [
+    "docs/**/*.md"
+  ],
   "rules": [
-    { "when": "source_modified", "require": "task_started" },
-    { "when": "source_modified", "require": "code_reviewed" },
-    { "when": "source_modified", "require": "doc_reviewed" },
-    { "when": "source_modified", "require": "security_reviewed" },
-    { "when": "source_modified", "require": "tests_acknowledged" }
+    {
+      "when": "source_modified",
+      "require": "task_started"
+    },
+    {
+      "when": "source_modified",
+      "require": "code_reviewed"
+    },
+    {
+      "when": "source_modified",
+      "require": "doc_reviewed"
+    },
+    {
+      "when": "source_modified",
+      "require": "security_reviewed"
+    },
+    {
+      "when": "source_modified",
+      "require": "tests_acknowledged"
+    }
   ],
   "mode_overrides": {
-    "minimal": { "rules": [] }
+    "minimal": {
+      "rules": []
+    }
   },
   "cleanup": {
     "max_status_entries": 10,
