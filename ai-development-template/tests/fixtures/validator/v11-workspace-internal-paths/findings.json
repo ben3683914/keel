@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "V-11",
+    "ruleId": "workspace-internal-paths",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/config/workspace.yaml",
+    "message": "Project `evil` declares path `../outside` outside the workspace root"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "V-2",
+    "ruleId": "duplicate-article-number",
+    "mode": "silent",
+    "severity": "error",
+    "file": "state/articles/second-rule.md",
+    "message": "Duplicate article number 5 in scope `workspace`; renumbering to 1"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "rule": "V-4",
+    "ruleId": "dangling-reference",
+    "mode": "proposed",
+    "severity": "warning",
+    "file": "state/tasks/T-ref01-refers.md",
+    "message": "Dangling reference `A-gone1` in `arc` (not in files or git history)"
+  },
+  {
+    "rule": "V-4",
+    "ruleId": "dangling-reference",
+    "mode": "proposed",
+    "severity": "warning",
+    "file": "state/tasks/T-ref01-refers.md",
+    "message": "Dangling reference `T-gone1` in `depends_on` (not in files or git history)"
+  }
+]

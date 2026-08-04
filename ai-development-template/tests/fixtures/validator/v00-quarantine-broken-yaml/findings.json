@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "quarantine",
+    "ruleId": "unparseable-yaml",
+    "mode": "proposed",
+    "severity": "critical",
+    "file": "state/tasks/T-brk00-broken.md",
+    "message": "Unparseable YAML: Flow sequence in block collection must be sufficiently indented and end with a ] at line 2, column 1:\n\nid: [broken\ntitle: :\n^\n"
+  }
+]

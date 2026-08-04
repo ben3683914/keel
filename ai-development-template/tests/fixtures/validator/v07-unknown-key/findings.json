@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "V-7",
+    "ruleId": "unknown-frontmatter-key",
+    "mode": "proposed",
+    "severity": "warning",
+    "file": "state/tasks/T-key01-typo.md",
+    "message": "Unknown key `statuss` in task frontmatter"
+  }
+]

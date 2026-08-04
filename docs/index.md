@@ -1,3 +1,7 @@
+> **Version:** 1.0.0
+> **Last Updated:** 2026-08-04
+> **Status:** Approved
+
 # Documentation Index
 
 > (project description)

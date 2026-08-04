@@ -1,0 +1,26 @@
+[
+  {
+    "rule": "V-5",
+    "ruleId": "arc-membership-disagreement",
+    "mode": "silent",
+    "severity": "warning",
+    "file": "state/arcs/A-arc01-first-arc.md",
+    "message": "Arc `A-arc01` is missing member(s) T-mem03 that reference it; union wins for membership"
+  },
+  {
+    "rule": "V-5",
+    "ruleId": "arc-membership-disagreement",
+    "mode": "silent",
+    "severity": "warning",
+    "file": "state/tasks/T-mem02-two.md",
+    "message": "Task `T-mem02` is a member of arc `A-arc01` but has no back-reference; setting `arc: A-arc01`"
+  },
+  {
+    "rule": "V-5",
+    "ruleId": "arc-membership-disagreement",
+    "mode": "proposed",
+    "severity": "warning",
+    "file": "state/tasks/T-mem04-four.md",
+    "message": "Task `T-mem04` claims arc `A-arc02` but is listed in arc `A-arc01` — contradictory"
+  }
+]

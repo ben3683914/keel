@@ -1,6 +1,6 @@
 # Keel State Layer — Design
 
-**Version:** 1.0.0 | **Last Updated:** 2026-07-29 | **Status:** Approved
+**Version:** 1.1.3 | **Last Updated:** 2026-08-04 | **Status:** Approved
 **Task:** T-007 | **Decision record:** [keel-decisions/state-model.md](keel-decisions/state-model.md)
 
 ## Overview
@@ -269,6 +269,8 @@ The state layer is a library inside the engine; MCP servers and hooks call it (P
 
 All git-touching operations take an explicit `repoRoot` parameter through one thin git layer (G18 seam 3) — the engine never assumes `cwd` is the repo.
 
+This table is the **designed** surface. For the **as-built** surface — the three-tier barrel, the scope constructors and `resolveRepoRoot` a caller needs, and the three operations (`rebuildIndex`, `renderBoard`, `archiveLookup`) not yet implemented — see [Implementation Notes (T-009)](#implementation-notes-t-009).
+
 ## Dependencies
 
 - **Consumed by:** every Foundation/Workflow/Platform task (T-009 implements this design; T-010 the index; T-011 the board renderer).
@@ -292,3 +294,32 @@ All git-touching operations take an explicit `repoRoot` parameter through one th
 - **Byte-equivalence:** rebuild the index and board.md twice from the same truth on two paths — byte-identical (Article 002).
 - **Merge-shape tests:** two synthetic branches touching (a) different entities → clean merge; (b) same entity, frontmatter vs body → auto-merge; (c) colliding ids/numbers → validator repairs to a stable result.
 - **Round-trip:** parse → canonical serialize → parse is a fixed point for every fixture, including files with `ext:` blocks and YAML comments.
+
+## Implementation Notes (T-009)
+
+Implemented in `ai-development-template/src/` as nine modules — `yaml` (canonical serialization, comment preservation), `registry` (declared schemas, id prefixes, V-rule config), `schema` (validation engine), `layout` (directory layout + state kinds), `id` (minting), `git` (thin git layer), `entity` (read/list/write, atomic writes), `validator` (V-1..V-13 + repair), `shared` (internal utils) — behind the `src/index.ts` public barrel. The comment-preserving parser is the `yaml` package (`^2.9`), the engine's first runtime dependency. 179 tests across 14 files; coverage thresholds active (~97.5% lines / ~84.7% branches against the 80/75 gate).
+
+**Immutability of declared data.** Everything the tier-2 `registry` namespace exports — `ARTICLE_CATEGORIES`, `TASK_STATUSES`, the entity schemas, `ID_PREFIXES`, `VALIDATION_RULES` — is deep-frozen at module load via `deepFreeze` (`src/shared`, tier 3). Declared data is a read-only contract: a consumer cannot mutate the registry to change validation behavior for every other caller. Path containment (`assertContained`) and atomic writes (`atomicWrite`) live alongside it in `shared`.
+
+**Public API surface — three tiers.** The barrel is deliberately narrower than the module set, so internal helpers never become public contracts:
+
+| Tier | Shape | Contents |
+|------|-------|----------|
+| 1 | Flat named exports | The interface table's operations (`mintId`, `readEntity`, `readEntityByPath`, `listEntities`, `writeEntity`, `validate`, `repair`), the scope constructors needed to call them (`workspaceScope`, `projectScope`), `resolveRepoRoot`, the `isRepairAction` guard, and every type reachable from one of those signatures (`Entity`, `EntityRef`, `EntityType`, `EntityFilter`, `ListResult`, `ReadResult`, `WriteEntityInput`, `WriteResult`, `WriteOptions`, `WriteEvent`, `Finding`, `FindingMode`, `FindingSeverity`, `ScopePaths`, `ScopeRef`, `ValidateOptions`, `ValidationRuleSpec`, `RepairOptions`, `RepairResult`, `RepairMode`, `RepairAction`, `MintOptions`, `MintedId`, `IdPrefixSpec`, `ExecFileFn`, `ClockFn`, `RandomFn`) |
+| 2 | Namespaces (`export * as`) | `registry` (declared data other subsystems must read — Article 003, T-014/T-015), `layout` and `yaml` (index build T-010, board render T-011), `git` (reconciler T-030), `schema` (helpers for authors of new validation rules) |
+| 3 | Not exported | Internal helpers with no named consumer — `kebabTitle`, `drawSlug`, `formatMintDate`, and the remaining `entity`/`validator` internals. Still deep-importable for tests |
+
+`Finding.repair` stays typed `unknown` on purpose — registry-declared rules (Article 003) may carry their own payloads — so `RepairAction`/`ScopeRef` are reached through the exported `isRepairAction` guard rather than through a signature, which keeps consumers off unchecked `as` casts. Tier-1 names that also live inside a tier-2 namespace (`resolveRepoRoot` in `git`, `workspaceScope`/`projectScope` in `layout`) are intentionally reachable both ways. `tests/unit/index.test.ts` enforces all three tiers: every tier-1 operation gets a typechecked (but unevaluated) call site with a barrel-nameable return type, each tier-2 namespace is probed for a known member, and tier-3 names are asserted absent.
+
+Deviations from this design accepted during code review:
+
+| # | Design said | Implemented as |
+|---|-------------|----------------|
+| 1 | V-1 repair rewrites references to the re-minted id | Re-mints the younger **and** emits proposed companion findings on entities referencing the duplicated id |
+| 2 | V-2/V-3 renumber silently | On band saturation, a proposed "band full" finding — V-1/V-2/V-3 are silent-or-proposed, not purely silent |
+| 3 | V-4 "annotate resolved-by-archive" (shape unspecified) | Annotation stored as `ext.keel.resolved_by_archive` |
+| 4 | V-12 canonicalization scope implicit | Applies to state entities + configs + curation, **not** doc frontmatter |
+| 5 | Validator runs over docs/ trees | `validate()` does not yet scan `docs/` — deferred to the routing/reconciler tasks |
+| 6 | Unparseable YAML "quarantined as findings" | Expressed as declared rule entry `unparseable-yaml` (critical/proposed) |
+| 7 | Article `category` enum "from declared config" | Ships as a registry-declared default list; config ownership comes later |
+| 8 | `writeEntity` triggers index update + board render | Exposes an `onWrite` callback seam for T-010/T-011; `rebuildIndex`, `renderBoard`, `archiveLookup` not implemented in T-009 |

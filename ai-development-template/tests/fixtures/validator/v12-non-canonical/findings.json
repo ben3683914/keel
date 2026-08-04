@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "V-12",
+    "ruleId": "non-canonical-serialization",
+    "mode": "silent",
+    "severity": "info",
+    "file": "state/tasks/T-can01-messy.md",
+    "message": "File is not in canonical YAML serialization; rewriting canonically (content-identical)"
+  }
+]

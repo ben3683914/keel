@@ -1,0 +1,26 @@
+[
+  {
+    "rule": "V-1",
+    "ruleId": "duplicate-entity-id",
+    "mode": "silent",
+    "severity": "error",
+    "file": "state/tasks/T-dup01-beta.md",
+    "message": "Duplicate id `T-dup01` (also in state/tasks/T-dup01-alpha.md); the younger file is re-minted"
+  },
+  {
+    "rule": "V-1",
+    "ruleId": "duplicate-entity-id",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/tasks/T-ref99-referencer.md",
+    "message": "Reference `T-dup01` in `depends_on` is ambiguous after re-mint of a duplicate; confirm whether it should point at the surviving `T-dup01` (state/tasks/T-dup01-alpha.md) or the re-minted entity"
+  },
+  {
+    "rule": "V-12",
+    "ruleId": "non-canonical-serialization",
+    "mode": "silent",
+    "severity": "info",
+    "file": "state/tasks/T-dup01-beta.md",
+    "message": "File is not in canonical YAML serialization; rewriting canonically (content-identical)"
+  }
+]

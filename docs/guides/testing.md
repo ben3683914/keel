@@ -1,6 +1,6 @@
-> **Version:** 0.2.0
-> **Last Updated:** 2026-07-29
-> **Status:** Active
+> **Version:** 0.2.3
+> **Last Updated:** 2026-08-04
+> **Status:** Approved
 
 # Testing Guide
 
@@ -19,7 +19,10 @@ project folder:
 
 CI (`.github/workflows/ci.yml`) runs `npm run ci` on ubuntu/macos × Node 20/22 (required)
 and windows × Node 22 (advisory). Coverage thresholds (80% lines / 75% branches in
-`vitest.config.ts`) activate with the first real module (T-009).
+`vitest.config.ts`) are active as of T-009 (state layer) and enforced on every run. The
+suite currently has 179 tests across 14 files: `tests/unit/` (one directory per `src/`
+module, plus `index.test.ts` guarding the public API barrel) and `tests/integration/`
+(git, validator).
 
 ### Organization
 

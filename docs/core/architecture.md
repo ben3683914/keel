@@ -1,5 +1,5 @@
-> **Version:** 0.2.0
-> **Last Updated:** 2026-07-29
+> **Version:** 0.2.1
+> **Last Updated:** 2026-08-04
 > **Status:** Draft
 
 # Architecture
@@ -23,7 +23,7 @@ graph TD
 
 | Component | Purpose | Location |
 |-----------|---------|----------|
-| Keel engine (`keel-engine`) | TypeScript/Node engine for the Keel rewrite — state, routing, board, and git layers land here (T-009+) | `ai-development-template/` |
+| Keel engine (`keel-engine`) | TypeScript/Node engine for the Keel rewrite. State layer implemented (T-009): entity read/list/write, schema validation + V-rule repair, id minting, canonical YAML, thin git layer. Routing index (T-010) and board renderer (T-011) attach next via the `writeEntity` `onWrite` seam | `ai-development-template/src/` |
 | CI pipeline | `npm run ci` gate on PRs and pushes to main; ubuntu/macos × Node 20/22 required, windows advisory | `.github/workflows/ci.yml` |
 | Legacy template engine | Python MCP servers, hooks, and enforcement scripts (being rewritten as Keel) | `.claude/scripts/` |
 
@@ -73,7 +73,7 @@ constitution, and task gates.
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| Keel engine | TypeScript (strict, ESM, NodeNext) on Node >= 20 | Vitest + v8 coverage, ESLint (type-checked) + Prettier; npm with committed lockfile |
+| Keel engine | TypeScript (strict, ESM, NodeNext) on Node >= 20 | Vitest + v8 coverage (thresholds enforced), ESLint (type-checked) + Prettier; npm with committed lockfile; runtime dep: `yaml` ^2.9 (comment-preserving parser) |
 | Legacy engine | Python 3.x | MCP servers, hooks, pytest regression tests |
 
 ## Data Flow

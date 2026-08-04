@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "V-9",
+    "ruleId": "invalid-enum-value",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/tasks/T-enu01-bad-status.md",
+    "message": "Invalid `status` value `doing` on task"
+  }
+]

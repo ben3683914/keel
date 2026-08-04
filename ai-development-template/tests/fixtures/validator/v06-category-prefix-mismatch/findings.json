@@ -1,0 +1,18 @@
+[
+  {
+    "rule": "V-6",
+    "ruleId": "category-prefix-mismatch",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/tasks/S-sec01-hardening.md",
+    "message": "Id prefix `S` implies category `security` but frontmatter says `bug`"
+  },
+  {
+    "rule": "V-6",
+    "ruleId": "category-prefix-mismatch",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/tasks/Z-odd01-strange.md",
+    "message": "Id prefix `Z` is not in the declared prefix table"
+  }
+]

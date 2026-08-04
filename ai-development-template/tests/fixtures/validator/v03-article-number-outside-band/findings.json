@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "V-3",
+    "ruleId": "article-number-outside-band",
+    "mode": "silent",
+    "severity": "error",
+    "file": "state/articles/big-number.md",
+    "message": "Article number 150 outside band 1–99; renumbering to 1"
+  }
+]

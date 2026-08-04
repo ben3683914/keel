@@ -1,0 +1,34 @@
+[
+  {
+    "rule": "V-8",
+    "ruleId": "missing-required-field",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/articles/ratified-rule.md",
+    "message": "Missing required body section `## Consequences` on article"
+  },
+  {
+    "rule": "V-8",
+    "ruleId": "missing-required-field",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/articles/ratified-rule.md",
+    "message": "Missing required body section `## Enforcement` on article"
+  },
+  {
+    "rule": "V-8",
+    "ruleId": "missing-required-field",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/articles/ratified-rule.md",
+    "message": "Missing required body section `## Rule` on article"
+  },
+  {
+    "rule": "V-8",
+    "ruleId": "missing-required-field",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "state/tasks/T-mis01-no-priority.md",
+    "message": "Missing required field `priority` on task"
+  }
+]

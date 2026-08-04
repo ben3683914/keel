@@ -1,6 +1,6 @@
 # Keel Engine Scaffold & CI — Design
 
-**Version:** 1.0.1 | **Last Updated:** 2026-07-29 | **Status:** Approved
+**Version:** 1.0.3 | **Last Updated:** 2026-08-04 | **Status:** Approved
 **Task:** T-008 | **Decision record:** [keel-decisions/platform.md](keel-decisions/platform.md) | **Parent design:** [state-layer.md](state-layer.md)
 
 ## Overview
@@ -43,7 +43,7 @@ Engine code is the product code of the `ai-development-template` project and liv
     dist/                       gitignored build output (tsc)
 ```
 
-Module folders beyond `git/` are added by the arcs that own them — `state/` (T-009), `routing/` (T-010), `board/` (T-011), and later seams (`mcp/`, `adapters/`). The scaffold does not pre-create empty directories for future work.
+Module folders beyond `git/` are added by the arcs that own them — the state layer (T-009, landed as `yaml/`, `registry/`, `schema/`, `layout/`, `id/`, `entity/`, `validator/`, `shared/` — see [state-layer.md](state-layer.md#implementation-notes-t-009)), `routing/` (T-010), `board/` (T-011), and later seams (`mcp/`, `adapters/`). The scaffold does not pre-create empty directories for future work.
 
 ## Toolchain
 
@@ -55,7 +55,7 @@ Module folders beyond `git/` are added by the arcs that own them — `state/` (T
 | Package manager | — | npm | Guaranteed alongside Node; lockfile committed |
 | Dev execution | dev | `tsx` | Run TS directly during development; never a runtime dependency |
 
-Runtime dependencies start at zero and are added deliberately by feature tasks (e.g. the comment-preserving YAML parser belongs to T-009). Dev dependencies never ship in the artifact (Engine/Data Separation is about logic; this is the footprint corollary).
+Runtime dependencies start at zero and are added deliberately by feature tasks (T-009 added the first: the comment-preserving `yaml` parser, `^2.9`). Dev dependencies never ship in the artifact (Engine/Data Separation is about logic; this is the footprint corollary).
 
 npm scripts (the interface other tasks and CI consume):
 
@@ -109,4 +109,4 @@ Every PR and push to main installs from the lockfile (`npm ci`), then runs the s
 
 ## Testing Notes
 
-The scaffold verifies itself by execution (setup principle: verify the capability, not its indicator): it lands with one real unit test and one real integration test exercising the temp-dir harness, so the first CI run proves the toolchain end-to-end rather than passing vacuously on zero tests. Coverage thresholds activate with the first real module (T-009) to avoid gating on placeholder code.
+The scaffold verifies itself by execution (setup principle: verify the capability, not its indicator): it lands with one real unit test and one real integration test exercising the temp-dir harness, so the first CI run proves the toolchain end-to-end rather than passing vacuously on zero tests. Coverage thresholds activated with the first real module (T-009, state layer) and are now enforced in every CI run.

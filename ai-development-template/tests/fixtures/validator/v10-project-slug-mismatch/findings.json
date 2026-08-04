@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "V-10",
+    "ruleId": "project-slug-mismatch",
+    "mode": "proposed",
+    "severity": "error",
+    "file": "web/state/config.yaml",
+    "message": "Project config slug `website` differs from registry key `web` (rename or copy-paste?)"
+  }
+]

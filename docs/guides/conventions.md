@@ -1,3 +1,7 @@
+> **Version:** 1.0.0
+> **Last Updated:** 2026-08-04
+> **Status:** Approved
+
 # Conventions
 
 Coding standards and naming conventions for this project.
